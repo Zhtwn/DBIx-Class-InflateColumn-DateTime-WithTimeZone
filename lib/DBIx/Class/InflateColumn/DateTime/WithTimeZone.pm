@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use base 'DBIx::Class::Core';
 
-use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.01_01';
 
 __PACKAGE__->load_components( qw/InflateColumn::DateTime/ );
 
