@@ -1,6 +1,6 @@
 # NAME
 
-DBIx::Class::InflateColumn::DateTime::WithTimeZone - Blah blah blah
+DBIx::Class::InflateColumn::DateTime::WithTimeZone - Store and retrieve DateTime time zones transparently
 
 # SYNOPSIS
 
@@ -9,6 +9,9 @@ DBIx::Class::InflateColumn::DateTime::WithTimeZone - Blah blah blah
 # DESCRIPTION
 
 DBIx::Class::InflateColumn::DateTime::WithTimeZone is
+
+timezone: sets time zone to be stored in database (default UTC)
+timezone\_source: column name for actual time zone
 
 # AUTHOR
 
@@ -24,3 +27,5 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 # SEE ALSO
+
+[DBIx::Class::InflateColumn::DateTime](https://metacpan.org/pod/DBIx::Class::InflateColumn::DateTime)

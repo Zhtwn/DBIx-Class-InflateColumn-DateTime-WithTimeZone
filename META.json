@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "Store and retrieve DateTime time zones transparently",
    "author" : [
       "Noel Maddy <zhtwnpanta@gmail.com>"
    ],
