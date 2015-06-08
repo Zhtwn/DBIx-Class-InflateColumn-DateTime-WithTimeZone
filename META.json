@@ -1,5 +1,5 @@
 {
-   "abstract" : "Store and retrieve DateTime time zones transparently",
+   "abstract" : "Store time zones with DateTimes in database",
    "author" : [
       "Noel Maddy <zhtwnpanta@gmail.com>"
    ],

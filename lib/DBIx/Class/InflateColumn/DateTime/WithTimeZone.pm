@@ -8,11 +8,6 @@ our $VERSION = '0.01_01';
 
 __PACKAGE__->load_components( qw/InflateColumn::DateTime/ );
 
-# TODO
-# - misuse $info->{_ic_dt_method} for now, to get type
-# - describe interaction with floating_tz_ok
-# - add checks on timezone_source column data_type
-
 sub register_column {
     my ( $self, $column, $info, @rest ) = @_;
 
@@ -30,6 +25,7 @@ sub register_column {
             $self->throw_exception( "$msg could not find column $tz_col for timezone_source" );
         }
 
+        # force InflateColumn::DateTime to convert to UTC before storing
         $info->{timezone} ||= 'UTC';
         if ( $info->{timezone} ne 'UTC' ) {
             $self->throw_exception( "$msg saving non-UTC datetimes in database is not supported" );
@@ -69,18 +65,106 @@ __END__
 
 =head1 NAME
 
-DBIx::Class::InflateColumn::DateTime::WithTimeZone - Store and retrieve DateTime time zones transparently
+DBIx::Class::InflateColumn::DateTime::WithTimeZone - Store time zones with DateTimes in database
 
 =head1 SYNOPSIS
 
-  use DBIx::Class::InflateColumn::DateTime::WithTimeZone;
+Set up table with separate column to store time zone, and set that column as
+the timezone_source column for the datetime column.
+
+  package Event;
+  use base 'DBIx::Class::Core';
+
+  __PACKAGE__->load_components(qw/InflateColumn::DateTime::WithTimeZone/);
+
+  __PACKAGE_->add_columns(
+      event_time => { data_type => 'timestamp', timezone_source => 'event_tz' },
+      event_tz   => { data_type => 'varchar', size => 38 },
+  );
+
+Store any DateTime into the database
+
+  $dt = DateTime->new( year => 2015, month => 6, day => 8, hour => 9, minute => 10
+      time_zone => 'America/Chicago' );
+
+  $row = $schema->resultset('Event')->create( { event_time => $dt } );
+
+In the database, event_time is now set to the UTC time corresponding to the
+original time (2015-06-08T14:10:00), and event_tz is set to 'America/Chicago'.
+
+When retrieved from the database, event_time will be returned as an identical
+DateTime object, with the same time zone as the original DateTime
+
+  $row = $schema->resultset('Event')->first;
+
+  say $row->event_time . '';                # 2015-06-08T09:10:00
+
+  say $row->event_time->time_zone->name;    # America/Chicago
 
 =head1 DESCRIPTION
 
-DBIx::Class::InflateColumn::DateTime::WithTimeZone is
+This module allows storage and retrieval of DateTime objects while
+preserving their time zone. It uses InflateColumn::DateTime to do the
+basic inflation / deflation, saving the time zone into a separate
+database column when deflating, and applying the time zone when inflating.
 
-timezone: sets time zone to be stored in database (default UTC)
-timezone_source: column name for actual time zone
+Since the DateTime's time zone is preserved, there is no need to have
+additional logic to manage the time zone when storing or retrieving in the
+database.
+
+The datetime is converted to UTC before storage in the database. This
+ensures that the datetime is unambiguous and sortable, because it
+avoids ambiguous datetimes that can occur during DST transition.
+
+=head2 Limitations
+
+=over
+
+=item *
+
+The time zone column must be long enough to store the longest
+zoneinfo name. Currently, that's 38 characters, but I can't find
+any guarantee that will not change.
+
+=item *
+
+Does not preserve locale from the DateTime object. Would this be useful?
+
+=back
+
+=head2 Future Work
+
+=over
+
+=item *
+
+Expand the tests to validate against databases other than SQLite
+
+=item *
+
+Investigate and document interaction with locale
+
+=item *
+
+Add validation of the data_type and size of the timezone_source column
+
+=back
+
+=head2 Implementation
+
+=head3 _ic_dt_method
+
+Uses the $info->{_ic_dt_method} value set by InflateColumn::DateTime
+to determine the column datatype, rather than duplicating the
+detection code
+
+=head3 register_columns
+
+Wraps register_columns to validate the column attributes
+
+=head3 _post_inflate_datetime
+
+=head3 _pre_deflate_datetime
 
 =head1 AUTHOR
 
@@ -97,6 +181,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<DBIx::Class::InflateColumn::DateTime>
+L<DBIx::Class::InflateColumn::DateTime>, L<DBIx::Class::InflateColumn>, L<DateTime>
 
 =cut
