@@ -164,7 +164,11 @@ Wraps register_columns to validate the column attributes
 
 =head3 _post_inflate_datetime
 
+Sets time zone from the timezone_source column DateTime inflation
+
 =head3 _pre_deflate_datetime
+
+Sets timezone_source column to time zone name before DateTime deflation
 
 =head1 AUTHOR
 
