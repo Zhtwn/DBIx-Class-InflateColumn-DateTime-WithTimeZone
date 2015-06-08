@@ -48,6 +48,17 @@
       }
    },
    "release_status" : "testing",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone/issues"
+      },
+      "homepage" : "https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone.git",
+         "web" : "https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone"
+      }
+   },
    "version" : "0.01_01"
 }
 

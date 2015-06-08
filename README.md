@@ -78,7 +78,11 @@ Wraps register\_columns to validate the column attributes
 
 ### \_post\_inflate\_datetime
 
+Sets time zone from the timezone\_source column DateTime inflation
+
 ### \_pre\_deflate\_datetime
+
+Sets timezone\_source column to time zone name before DateTime deflation
 
 # AUTHOR
 
