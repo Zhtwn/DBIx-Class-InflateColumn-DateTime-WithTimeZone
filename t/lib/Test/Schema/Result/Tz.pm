@@ -9,8 +9,8 @@ __PACKAGE__->add_columns(
     id     => { data_type => 'integer' },
     ts     => { data_type => 'timestamp', timezone_source => 'tz' },
     tz     => { data_type => 'varchar' },
-    ts_utc => { data_type => 'timestamp', timezone_source => 'tz_utc', timezone => 'UTC' },
     tz_utc => { data_type => 'varchar' },
+    ts_utc => { data_type => 'timestamp', timezone_source => 'tz_utc', timezone => 'UTC' },
 );
 
 # need primary key so discard_changes works
