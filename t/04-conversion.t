@@ -18,9 +18,6 @@ is( $result_source->column_info('ts')->{timezone},
 is( $result_source->column_info('ts_utc')->{timezone},
     'UTC', 'explicit UTC timezone correct' );
 
-is( $result_source->column_info('ts_oth')->{timezone},
-    'America/Chicago', 'explicit non-UTC timezone correct' );
-
 my $now = DateTime->now( time_zone => 'America/Chicago' );
 
 my $row = $resultset->create(
@@ -28,13 +25,12 @@ my $row = $resultset->create(
         id     => 1,
         ts     => $now,
         ts_utc => $now,
-        ts_oth => $now,
     }
 );
 
 $row->discard_changes;
 
-for my $col_name (qw{ ts ts_utc ts_oth }) {
+for my $col_name (qw{ ts ts_utc }) {
     my $val = $row->$col_name;
     isa_ok( $val, 'DateTime', "$col_name column" );
     is( $val,                  $now . '',         '  DateTime corect' );

@@ -32,6 +32,9 @@ sub register_column {
         }
 
         $info->{timezone} ||= 'UTC';
+        if ( $info->{timezone} ne 'UTC' ) {
+            $self->throw_exception( "$msg saving non-UTC datetimes in database is not supported" );
+        }
     }
 }
 

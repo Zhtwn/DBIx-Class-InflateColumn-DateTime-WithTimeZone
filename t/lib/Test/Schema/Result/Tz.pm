@@ -11,8 +11,6 @@ __PACKAGE__->add_columns(
     tz     => { data_type => 'varchar' },
     ts_utc => { data_type => 'timestamp', timezone_source => 'tz_utc', timezone => 'UTC' },
     tz_utc => { data_type => 'varchar' },
-    ts_oth => { data_type => 'timestamp', timezone_source => 'tz_oth', timezone => 'America/Chicago' },
-    tz_oth => { data_type => 'varchar' },
 );
 
 # need primary key so discard_changes works
