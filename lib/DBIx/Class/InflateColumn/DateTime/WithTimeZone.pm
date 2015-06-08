@@ -6,6 +6,7 @@ use base 'DBIx::Class::Core';
 
 our $VERSION = '0.01_01';
 
+# you can simply `use base 'InflateColumn::DateTime'; ` instead
 __PACKAGE__->load_components( qw/InflateColumn::DateTime/ );
 
 sub register_column {
@@ -27,6 +28,7 @@ sub register_column {
 
         # force InflateColumn::DateTime to convert to UTC before storing
         $info->{timezone} ||= 'UTC';
+        # that seems like an artificial limitation... is there a technical reason for it?
         if ( $info->{timezone} ne 'UTC' ) {
             $self->throw_exception( "$msg saving non-UTC datetimes in database is not supported" );
         }
@@ -39,6 +41,8 @@ sub _post_inflate_datetime {
     $dt = $self->next::method( $dt, $info );
 
     if ( my $tz_src = $info->{timezone_source} ) {
+        # you need to call ->has_column_loaded and/or deal with NULLs correctly
+        # DT->set_time_zone will barf in a very unhelpful way
         $dt->set_time_zone( $self->get_column($tz_src) );
     }
 
@@ -53,6 +57,7 @@ sub _pre_deflate_datetime {
     }
 
     # HACK - protect DateTime argument from changing
+    # that's hardly a hack - it is the documented DT API
     $dt = $self->next::method( $dt->clone, $info );
 
     return $dt;
