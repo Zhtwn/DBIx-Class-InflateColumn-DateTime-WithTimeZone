@@ -32,45 +32,90 @@ DateTime object, with the same time zone as the original DateTime
 
     $row = $schema->resultset('Event')->first;
 
-    say $row->event_time . '';                # 2015-06-08T09:10:00
+    $event_time = $row->event_time;
 
-    say $row->event_time->time_zone->name;    # America/Chicago
+    say $event_time . '';                # 2015-06-08T09:10:00
+
+    say $event_time->time_zone->name;    # America/Chicago
 
 # DESCRIPTION
 
-This module allows storage and retrieval of DateTime objects while
-preserving their time zone. It uses InflateColumn::DateTime to do the
-basic inflation / deflation, saving the time zone into a separate
-database column when deflating, and applying the time zone when inflating.
+This component preserves the time zone of DateTime objects when
+storing and retrieving through DBIx::Class.
 
-Since the DateTime's time zone is preserved, there is no need to have
-additional logic to manage the time zone when storing or retrieving in the
-database.
+It uses InflateColumn::DateTime to do the basic inflation and
+deflation. The time zone is saved into an additional database
+column, and automatically applied to the DateTime after
+inflation.
 
-The datetime is converted to UTC before storage in the database. This
-ensures that the datetime is unambiguous and sortable, because it
-avoids ambiguous datetimes that can occur during DST transition.
+## UTC-only
 
-## Limitations
+The datetime is always converted to UTC before storage in the
+database. This ensures that the real time is preserved, no
+matter how the clock time is affected by the time zone.
 
-- The time zone column must be long enough to store the longest
+This avoids the problems cause by Daylight Saving Time.
+If the datetime were stored in any time zone that has Daylight
+Saving Time, then any datetime that occurs during the
+transition out of Daylight Saving Time (when the clock goes
+back one hour) will be ambiguous. DateTime handles this by
+always using the latest real time for the given clock time.
+See [https://metacpan.org/pod/DateTime#Ambiguous-Local-Times](https://metacpan.org/pod/DateTime#Ambiguous-Local-Times).
+
+# USAGE NOTES
+
+## Interaction with InflateColumn::DateTime
+
+- timezone
+
+    The timezone attribute is defaulted to UTC. If a non-UTC timezone
+    is specified, an exception will be thrown, since non-UTC time zones
+    can not guarantee that the retrieved DateTime matches the saved
+    DateTime.
+
+- locale
+
+    The locale attribute is not affected by this component, so it
+    should work as documented in InflateColumn::DateTime.
+
+## Nullable columns
+
+If the datetime column is nullable, the timezone\_source column must also
+be nullable. If it is not, a exception will be thrown when the schema is
+loaded.
+
+## Missing timezone column
+
+If a datetime column with a timezone\_source is included in a ResultSet,
+the corresponding timezone\_source column must also be included.
+
+If the timezone\_source column is missing, a runtime exception will be
+thrown when the datetime column is accessed.
+
+## Timezone column size
+
+The time zone column must be long enough to store the longest
 zoneinfo name. Currently, that's 38 characters, but I can't find
 any guarantee that will not change.
-- Does not preserve locale from the DateTime object. Would this be useful?
 
-## Future Work
+This component does not yet validate the timezone column data type
+or size. This may result in 
 
-- Expand the tests to validate against databases other than SQLite
-- Investigate and document interaction with locale
-- Add validation of the data\_type and size of the timezone\_source column
+## Implementation Details
 
-## Implementation
+This component uses internal methods and data from
+[DBIx::Class::InflateColumn::DateTime](https://metacpan.org/pod/DBIx::Class::InflateColumn::DateTime):
 
 ### \_ic\_dt\_method
 
 Uses the $info->{\_ic\_dt\_method} value set by InflateColumn::DateTime
 to determine the column datatype, rather than duplicating the
-detection code
+detection code.
+
+### \_\_dbic\_colname
+
+Uses the $info->{\_\_dbic\_colname} value set by InflateColumn::DateTime
+to provide the column name in error messages.
 
 ### register\_columns
 
@@ -83,6 +128,12 @@ Sets time zone from the timezone\_source column DateTime inflation
 ### \_pre\_deflate\_datetime
 
 Sets timezone\_source column to time zone name before DateTime deflation
+
+# TODO
+
+- Expand the tests to validate against databases other than SQLite
+- Investigate and document interaction with locale
+- Add validation of the data\_type and size of the timezone\_source column
 
 # AUTHOR
 
