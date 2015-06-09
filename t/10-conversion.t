@@ -1,6 +1,7 @@
 use strict;
 use Test::More;
 use Test::Fatal;
+use Test::Warn;
 
 use DateTime;
 
@@ -78,7 +79,7 @@ $schema->storage->dbh->do('UPDATE tz SET tz_null = NULL');
 # force reselect
 $null_row->discard_changes;
 
-is( exception { $dt_null = $null_row->dt_null }, undef, "retrieving with null timezone succeds" );
+warning_like { $dt_null = $null_row->dt_null } qr/dt_null had null timezone/, "retrieving with null timezone gives warning";
 
 my $no_tz_resultset = $schema->resultset('Tz')->search( { id => 1 }, { columns => [ 'id', 'dt' ] } );
 
