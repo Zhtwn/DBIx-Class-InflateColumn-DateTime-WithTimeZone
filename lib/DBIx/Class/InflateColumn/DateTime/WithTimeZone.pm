@@ -134,13 +134,16 @@ The datetime is always converted to UTC before storage in the
 database. This ensures that the real time is preserved, no
 matter how the clock time is affected by the time zone.
 
-This avoids the problems cause by Daylight Saving Time.
+This avoids the problems caused by Daylight Saving Time.
 If the datetime were stored in any time zone that has Daylight
 Saving Time, then any datetime that occurs during the
 transition out of Daylight Saving Time (when the clock goes
 back one hour) will be ambiguous. DateTime handles this by
-always using the latest real time for the given clock time.
-See L<https://metacpan.org/pod/DateTime#Ambiguous-Local-Times>.
+always using the latest real time for the given clock time
+(see L<DateTime#Ambiguous-Local-Times>). In this case,
+any DateTime from the earlier pass through the overlapped times
+will be converted to the later time when it is read, effectively
+adding the DST offset to the time.
 
 =head1 USAGE NOTES
 
