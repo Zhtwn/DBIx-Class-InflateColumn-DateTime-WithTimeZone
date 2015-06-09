@@ -6,7 +6,10 @@ use lib qw( t/lib );
 
 eval "use Test::MissingTzSchema";
 
-# FIXME - better verification of error message
-isnt( $@, undef, 'timestamp_source with missing column gives error' );
+my $err = $@;
+
+like( $err, qr/could not find.* tz/ ,
+  'timestamp_source with missing column gives error' )
+  or diag $err;
 
 done_testing;

@@ -18,10 +18,11 @@ sub register_column {
             $self->throw_exception( "$msg timezone_source requires datetime data_type");
         }
 
-        my $tz_info = $self->column_info($tz_source);
-        if ( !$tz_info ) {
+        if ( !$self->has_column($tz_source) ) {
             $self->throw_exception( "$msg could not find column $tz_source for timezone_source" );
         }
+
+        my $tz_info = $self->column_info($tz_source);
 
         # force InflateColumn::DateTime to convert to UTC before storing
         $info->{timezone} ||= 'UTC';
