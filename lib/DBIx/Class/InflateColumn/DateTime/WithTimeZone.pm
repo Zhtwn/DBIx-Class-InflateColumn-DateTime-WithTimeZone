@@ -2,11 +2,9 @@ package DBIx::Class::InflateColumn::DateTime::WithTimeZone;
 
 use strict;
 use warnings;
-use base 'DBIx::Class::Core';
+use base 'DBIx::Class::InflateColumn::DateTime';
 
 our $VERSION = '0.01_01';
-
-__PACKAGE__->load_components( qw/InflateColumn::DateTime/ );
 
 sub register_column {
     my ( $self, $column, $info, @rest ) = @_;
