@@ -6,7 +6,8 @@ use lib qw( t/lib );
 
 eval "use Test::NonUtcSchema";
 
-# FIXME - better verification of error message
-isnt( $@, undef, 'timestamp_source with missing column gives error' );
+my $err = $@;
+
+like( $@, qr/non-UTC/, 'timestamp_source with non-UTC time zone gives error' );
 
 done_testing;
