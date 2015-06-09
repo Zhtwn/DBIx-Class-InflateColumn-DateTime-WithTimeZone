@@ -20,13 +20,17 @@ sub register_column {
 
         my $tz_info = $self->column_info($tz_source);
         if ( !$tz_info ) {
-            $self->throw_exception( "$msg could not find column $tz_info for timezone_source" );
+            $self->throw_exception( "$msg could not find column $tz_source for timezone_source" );
         }
 
         # force InflateColumn::DateTime to convert to UTC before storing
         $info->{timezone} ||= 'UTC';
         if ( $info->{timezone} ne 'UTC' ) {
             $self->throw_exception( "$msg saving non-UTC datetimes in database is not supported" );
+        }
+
+        if ( $info->{is_nullable} && !$tz_info->{is_nullable} ) {
+            $self->throw_exception( "$msg: is nullable, so $tz_source must also be nullable" );
         }
     }
 }
@@ -113,6 +117,9 @@ database.
 The datetime is converted to UTC before storage in the database. This
 ensures that the datetime is unambiguous and sortable, because it
 avoids ambiguous datetimes that can occur during DST transition.
+
+If the datetime column is nullable, the timezone_source column must also
+be nullable. If it is not, a exception will be thrown.
 
 =head2 Limitations
 
