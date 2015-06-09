@@ -1,5 +1,7 @@
 use strict;
 use Test::More;
+use Test::Fatal;
+
 use DateTime;
 
 use lib qw( t/lib );
@@ -55,5 +57,9 @@ for my $col_name (qw{ dt dt_utc }) {
     is( $raw_val . '', $expected_dt . '', "$col_name column raw value correct" )
       or diag "database datetime: $raw_str";
 }
+
+my $dt_null;
+is( exception { $dt_null = $row->dt_null }, undef, 'retrieving null datetime succeeds' );
+is( $dt_null, undef, '  and is undef' );
 
 done_testing;
