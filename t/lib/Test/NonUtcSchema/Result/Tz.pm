@@ -6,7 +6,7 @@ __PACKAGE__->table('tz');
 __PACKAGE__->load_components('InflateColumn::DateTime::WithTimeZone');
 
 __PACKAGE__->add_columns(
-    ts_oth => {
+    dt_oth => {
         data_type       => 'timestamp',
         timezone_source => 'tz_oth',
         timezone        => 'America/Chicago',

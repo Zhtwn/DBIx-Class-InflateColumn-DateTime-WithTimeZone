@@ -7,10 +7,10 @@ __PACKAGE__->load_components('InflateColumn::DateTime::WithTimeZone');
 
 __PACKAGE__->add_columns(
     id     => { data_type => 'integer' },
-    ts     => { data_type => 'timestamp', timezone_source => 'tz' },
+    dt     => { data_type => 'timestamp', timezone_source => 'tz' },
     tz     => { data_type => 'varchar' },
     tz_utc => { data_type => 'varchar' },
-    ts_utc => { data_type => 'timestamp', timezone_source => 'tz_utc', timezone => 'UTC' },
+    dt_utc => { data_type => 'timestamp', timezone_source => 'tz_utc', timezone => 'UTC' },
 );
 
 # need primary key so discard_changes works

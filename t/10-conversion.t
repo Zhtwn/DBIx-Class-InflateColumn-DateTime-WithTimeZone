@@ -12,10 +12,10 @@ my $resultset = $schema->resultset('Tz');
 
 my $result_source = $resultset->result_source;
 
-is( $result_source->column_info('ts')->{timezone},
+is( $result_source->column_info('dt')->{timezone},
     'UTC', 'timezone defaults to UTC' );
 
-is( $result_source->column_info('ts_utc')->{timezone},
+is( $result_source->column_info('dt_utc')->{timezone},
     'UTC', 'explicit UTC timezone correct' );
 
 my $now = DateTime->now( time_zone => 'America/Chicago' );
@@ -24,8 +24,8 @@ my $now_utc = $now->clone->set_time_zone('UTC');
 my $row = $resultset->create(
     {
         id     => 1,
-        ts     => $now,
-        ts_utc => $now,
+        dt     => $now,
+        dt_utc => $now,
     }
 );
 
@@ -33,7 +33,7 @@ $row->discard_changes;
 
 my $parser = $schema->storage->datetime_parser;
 
-for my $col_name (qw{ ts ts_utc }) {
+for my $col_name (qw{ dt dt_utc }) {
     my $val = $row->$col_name;
     my $info = $row->column_info($col_name);
     isa_ok( $val, 'DateTime', "$col_name column" );
@@ -51,7 +51,7 @@ for my $col_name (qw{ ts ts_utc }) {
         }
     );
 
-    my $expected_dt = $col_name eq 'ts_oth' ? $now : $now_utc;
+    my $expected_dt = $col_name eq 'dt_oth' ? $now : $now_utc;
     is( $raw_val . '', $expected_dt . '', "$col_name column raw value correct" )
       or diag "database datetime: $raw_str";
 }
