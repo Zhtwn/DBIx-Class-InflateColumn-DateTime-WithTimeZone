@@ -41,6 +41,11 @@ sub _post_inflate_datetime {
     $dt = $self->next::method( $dt, $info );
 
     if ( my $tz_src = $info->{timezone_source} ) {
+        if ( !$self->has_column_loaded($tz_src) ) {
+            my $colname = $info->{__dbic_colname};
+            $self->throw_exception(
+               "$colname needs time zone from $tz_src, but $tz_src is not loaded: check query?" );
+        }
         my $tz = $self->get_column($tz_src);
         if ($tz) {
             $dt->set_time_zone($tz);
@@ -131,6 +136,12 @@ be nullable. If it is not, a exception will be thrown.
 =head2 Limitations
 
 =over
+
+=item *
+
+If the datetime column is included in a ResultSet, the corresponding
+timezone_source column must also be included. If the tz column is missing,
+an exception will be thrown.
 
 =item *
 

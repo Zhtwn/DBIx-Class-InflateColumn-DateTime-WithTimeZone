@@ -80,4 +80,11 @@ $null_row->discard_changes;
 
 is( exception { $dt_null = $null_row->dt_null }, undef, "retrieving with null timezone succeds" );
 
+my $no_tz_resultset = $schema->resultset('Tz')->search( { id => 1 }, { columns => [ 'id', 'dt' ] } );
+
+my $no_tz_row = $no_tz_resultset->first;
+
+like( exception { $no_tz_row->dt }, qr/\bdt\b.*\btz\b/,
+"retrieving without timezone throws error" );
+
 done_testing;
