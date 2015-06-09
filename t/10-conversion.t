@@ -62,4 +62,22 @@ my $dt_null;
 is( exception { $dt_null = $row->dt_null }, undef, 'retrieving null datetime succeeds' );
 is( $dt_null, undef, '  and is undef' );
 
+# resilience -- what happens if time zone is null while datetime is not?
+my $null_row = $resultset->create(
+    {
+        id      => 2,
+        dt      => $now,    # unused, but not nullable
+        dt_utc  => $now,    # unused, but not nullable
+        dt_null => $now,
+    }
+);
+
+# null out time zone behind the scenes
+$schema->storage->dbh->do('UPDATE tz SET tz_null = NULL');
+
+# force reselect
+$null_row->discard_changes;
+
+is( exception { $dt_null = $null_row->dt_null }, undef, "retrieving with null timezone succeds" );
+
 done_testing;

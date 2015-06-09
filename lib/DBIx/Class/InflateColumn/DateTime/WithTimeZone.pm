@@ -41,7 +41,14 @@ sub _post_inflate_datetime {
     $dt = $self->next::method( $dt, $info );
 
     if ( my $tz_src = $info->{timezone_source} ) {
-        $dt->set_time_zone( $self->get_column($tz_src) );
+        my $tz = $self->get_column($tz_src);
+        if ($tz) {
+            $dt->set_time_zone($tz);
+        }
+        else {
+            warn sprintf '%s had null timezone (%s): using UTC',
+              $info->{__dbic_colname}, $tz_src;
+        }
     }
 
     return $dt;
