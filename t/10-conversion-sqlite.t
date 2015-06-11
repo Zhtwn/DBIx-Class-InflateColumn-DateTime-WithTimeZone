@@ -43,19 +43,20 @@ for my $col_name (qw{ dt dt_utc }) {
     is( $val,                  $now . '',         '  DateTime corect' );
     is( $val->time_zone->name, 'America/Chicago', '  time zone correct' );
 
-    my ( $raw_str, $raw_val );
+    my $raw_str;
     $schema->storage->dbh_do(
         sub {
             my ( $storage, $dbh ) = @_;
             my $vals =
               $dbh->selectcol_arrayref("SELECT $col_name FROM tz WHERE id = 1");
             $raw_str = $vals->[0];
-            $raw_val = $parser->parse_datetime( $raw_str, time_zone => $info->{timezone} );
         }
     );
 
-    my $expected_dt = $col_name eq 'dt_oth' ? $now : $now_utc;
-    is( $raw_val . '', $expected_dt . '', "$col_name column raw value correct" )
+    # all datetime values should be stored as UTC
+    my $expected_dt = $parser->format_datetime($now_utc);
+
+    is( $raw_str, $expected_dt, "$col_name column raw value correct" )
       or diag "database datetime: $raw_str";
 }
 
