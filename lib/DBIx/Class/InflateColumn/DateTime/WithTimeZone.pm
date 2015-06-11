@@ -72,8 +72,11 @@ sub _pre_deflate_datetime {
         $self->set_column( $tz_src, $dt->time_zone->name );
     }
 
-    # HACK - protect DateTime argument from changing
-    $dt = $self->next::method( $dt->clone, $info );
+    if ( !$ENV{DBIC_IC_DT_WTZ_MODIFY_TZ} ) {
+        $dt = $dt->clone;
+    }
+
+    $dt = $self->next::method( $dt, $info );
 
     return $dt;
 }
@@ -155,6 +158,22 @@ adding the DST offset to the time.
 =head2 Interaction with InflateColumn::DateTime
 
 =over
+
+=item Side effects on DateTime object
+
+Currently, if the timezone attribute is set on InflateColumn::DateTime, then
+the time zone on a DateTime object used to set the column may have its time
+zone changed to that of the timezone attribute. The time zone change only
+happens if the DateTime object is deflated for storage.
+See L<https://rt.cpan.org/Public/Bug/Display.html?id=105154>.
+
+By default, this component overrides this IC::DT behavior. The DateTime
+object used to set the column will not have its time zone changed.
+
+If you need this side effect, set the DBIC_IC_DT_WTZ_MODIFY_TZ environment
+variable, and the IC::DT behavior will be followed: any DateTime used to
+set the column value will have its time zone set to UTC if it has been
+deflated for storage in the database.
 
 =item timezone
 
