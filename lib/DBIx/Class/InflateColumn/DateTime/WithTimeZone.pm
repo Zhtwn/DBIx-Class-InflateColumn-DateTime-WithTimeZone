@@ -9,11 +9,22 @@ our $VERSION = '0.01_01';
 sub register_column {
     my ( $self, $column, $info, @rest ) = @_;
 
+    my $msg = "Column $column:";
+
+    # NOTE: must update $info before calling parent, b/c parent copies $info
+    if ( my $tz_source = $info->{timezone_source} ) {
+
+        # force InflateColumn::DateTime to convert to UTC before storing
+        $info->{timezone} ||= 'UTC';
+        if ( $info->{timezone} ne 'UTC' ) {
+            $self->throw_exception( "$msg saving non-UTC datetimes in database is not supported" );
+        }
+    }
+
     $self->next::method( $column, $info, @rest );
 
     if ( my $tz_source = $info->{timezone_source} ) {
         my $ic_dt_method = $info->{_ic_dt_method};
-        my $msg = "Column $column:";
         if ( !$ic_dt_method || !$ic_dt_method =~ /(?: datetime | timestamp )/x ) {
             $self->throw_exception( "$msg timezone_source requires datetime data_type");
         }
@@ -23,12 +34,6 @@ sub register_column {
         }
 
         my $tz_info = $self->column_info($tz_source);
-
-        # force InflateColumn::DateTime to convert to UTC before storing
-        $info->{timezone} ||= 'UTC';
-        if ( $info->{timezone} ne 'UTC' ) {
-            $self->throw_exception( "$msg saving non-UTC datetimes in database is not supported" );
-        }
 
         if ( $info->{is_nullable} && !$tz_info->{is_nullable} ) {
             $self->throw_exception( "$msg: is nullable, so $tz_source must also be nullable" );
