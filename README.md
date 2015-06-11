@@ -54,17 +54,36 @@ The datetime is always converted to UTC before storage in the
 database. This ensures that the real time is preserved, no
 matter how the clock time is affected by the time zone.
 
-This avoids the problems cause by Daylight Saving Time.
+This avoids the problems caused by Daylight Saving Time.
 If the datetime were stored in any time zone that has Daylight
 Saving Time, then any datetime that occurs during the
 transition out of Daylight Saving Time (when the clock goes
 back one hour) will be ambiguous. DateTime handles this by
-always using the latest real time for the given clock time.
-See [https://metacpan.org/pod/DateTime#Ambiguous-Local-Times](https://metacpan.org/pod/DateTime#Ambiguous-Local-Times).
+always using the latest real time for the given clock time
+(see [DateTime#Ambiguous-Local-Times](https://metacpan.org/pod/DateTime#Ambiguous-Local-Times)). In this case,
+any DateTime from the earlier pass through the overlapped times
+will be converted to the later time when it is read, effectively
+adding the DST offset to the time.
 
 # USAGE NOTES
 
 ## Interaction with InflateColumn::DateTime
+
+- Side effects on DateTime object
+
+    Currently, if the timezone attribute is set on InflateColumn::DateTime, then
+    the time zone on a DateTime object used to set the column may have its time
+    zone changed to that of the timezone attribute. The time zone change only
+    happens if the DateTime object is deflated for storage.
+    See [https://rt.cpan.org/Public/Bug/Display.html?id=105154](https://rt.cpan.org/Public/Bug/Display.html?id=105154).
+
+    By default, this component overrides this IC::DT behavior. The DateTime
+    object used to set the column will not have its time zone changed.
+
+    If you need this side effect, set the DBIC\_IC\_DT\_WTZ\_MODIFY\_TZ environment
+    variable, and the IC::DT behavior will be followed: any DateTime used to
+    set the column value will have its time zone set to UTC if it has been
+    deflated for storage in the database.
 
 - timezone
 
