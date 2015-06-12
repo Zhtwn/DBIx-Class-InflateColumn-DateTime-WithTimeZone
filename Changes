@@ -1,6 +1,8 @@
 Revision history for DBIx-Class-InflateColumn-DateTime-WithTimeZone
 
 {{$NEXT}}
+
+0.01_03  2015-06-11 21:56:51 MDT
         - add prerequisite for DBIx::Class deploy
 
 0.01_02  2015-06-11 20:49:25 MDT
