@@ -63,6 +63,6 @@
          "web" : "https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone"
       }
    },
-   "version" : "0.01_01"
+   "version" : "0.01_02"
 }
 

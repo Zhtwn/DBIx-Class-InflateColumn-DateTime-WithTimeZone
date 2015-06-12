@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base 'DBIx::Class::InflateColumn::DateTime';
 
-our $VERSION = '0.01_01';
+our $VERSION = '0.01_02';
 
 sub register_column {
     my ( $self, $column, $info, @rest ) = @_;
