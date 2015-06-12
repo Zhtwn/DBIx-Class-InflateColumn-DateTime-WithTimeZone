@@ -7,4 +7,6 @@ on test => sub {
     requires 'Test::Fatal', '0.014';
     requires 'DBD::SQLite', '1.46';
     requires 'DateTime', '1.18';
+    requires 'SQL::Translator', '0.11018';
+    requires 'DateTime::Format::SQLite', '0.11';
 };
