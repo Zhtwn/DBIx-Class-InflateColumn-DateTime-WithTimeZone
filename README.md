@@ -97,6 +97,12 @@ adding the DST offset to the time.
     The locale attribute is not affected by this component, so it
     should work as documented in InflateColumn::DateTime.
 
+## Interaction with TimeStamp
+
+All columns using the TimeStamp plugin will default to using the UTC
+time zone for all time stamps. To use a different time zone, override
+the get\_timestamp method and set the desired time zone there.
+
 ## Nullable columns
 
 If the datetime column is nullable, the timezone\_source column must also
@@ -118,7 +124,8 @@ zoneinfo name. Currently, that's 38 characters, but I can't find
 any guarantee that will not change.
 
 This component does not yet validate the timezone column data type
-or size. This may result in 
+or size. This may result in database exceptions if the time zone
+length is greater than the timezone\_source column length.
 
 ## Implementation Details
 
