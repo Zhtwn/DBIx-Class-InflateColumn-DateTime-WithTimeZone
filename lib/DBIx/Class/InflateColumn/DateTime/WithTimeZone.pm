@@ -6,6 +6,8 @@ use base 'DBIx::Class::InflateColumn::DateTime';
 
 our $VERSION = '0.02';
 
+use DateTime::TimeZone;
+
 sub register_column {
     my ( $self, $column, $info, @rest ) = @_;
 
@@ -41,6 +43,13 @@ sub register_column {
     }
 }
 
+my %tz_cache;
+
+sub _get_cached_tz {
+    my ( $self, $tz ) = @_;
+    return $tz_cache{$tz} ||= DateTime::TimeZone->new( name => $tz );
+}
+
 sub _post_inflate_datetime {
     my ( $self, $dt, $info ) = @_;
 
@@ -54,7 +63,7 @@ sub _post_inflate_datetime {
         }
         my $tz = $self->get_column($tz_src);
         if ($tz) {
-            $dt->set_time_zone($tz);
+            $dt->set_time_zone( $self->_get_cached_tz($tz) );
         }
         else {
             warn sprintf '%s had null timezone (%s): using UTC',
@@ -262,6 +271,10 @@ Investigate and document interaction with locale
 =item *
 
 Add validation of the data_type and size of the timezone_source column
+
+=item *
+
+Investigate using SQL backend features (e.g., C<AT TIME ZONE>)
 
 =back
 
