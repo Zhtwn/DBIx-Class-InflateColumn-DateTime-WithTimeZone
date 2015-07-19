@@ -160,6 +160,7 @@ Sets timezone\_source column to time zone name before DateTime deflation
 - Expand the tests to validate against databases other than SQLite
 - Investigate and document interaction with locale
 - Add validation of the data\_type and size of the timezone\_source column
+- Investigate using SQL backend features (e.g., `AT TIME ZONE`)
 
 # AUTHOR
 

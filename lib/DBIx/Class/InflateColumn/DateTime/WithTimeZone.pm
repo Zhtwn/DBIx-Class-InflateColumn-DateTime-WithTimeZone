@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base 'DBIx::Class::InflateColumn::DateTime';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use DateTime::TimeZone;
 
